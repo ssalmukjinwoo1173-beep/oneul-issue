@@ -44,7 +44,7 @@ html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans)
 .foot{display:flex;justify-content:center;align-items:center;gap:16px;padding:8px 0 max(12px,env(safe-area-inset-bottom));font-variant-numeric:tabular-nums;font-size:13px}
 </style></head><body>
 <div class="wrap">
-  <header class="mast"><h1>오늘의 이슈</h1><small>DAILY · 17:00</small></header>
+  <header class="mast"><h1>오늘의 이슈</h1><small>DAILY · 17:00 <button id="rf" class="rb" style="background:none;color:inherit;border:1px solid var(--line);padding:3px 10px;font-size:11px;margin-left:6px" type="button">새로고침</button></small></header>
   <section id="latest"></section>
   <section id="shelves" style="display:flex;flex-direction:column;gap:28px"></section>
 </div>
@@ -85,5 +85,11 @@ document.getElementById("next").onclick=function(){P.scrollTo({left:(idx()+1)*P.
 P.addEventListener("scroll",function(){requestAnimationFrame(cnt)},{passive:true});
 }
 (function(){var s=document.createElement("script");s.src="issues.js?t="+Date.now();s.onload=boot;s.onerror=boot;document.head.appendChild(s)})();
-document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"&&Date.now()-LOADED>20*60*1000&&document.getElementById("reader").hidden)location.reload()});
+function stale(){return Date.now()-LOADED>2*60*1000&&document.getElementById("reader").hidden}
+function fresh(){location.reload()}
+document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"&&stale())fresh()});
+window.addEventListener("focus",function(){if(stale())fresh()});
+window.addEventListener("pageshow",function(e){if(e.persisted||stale())fresh()});
+setInterval(function(){if(document.visibilityState==="visible"&&Date.now()-LOADED>15*60*1000&&document.getElementById("reader").hidden)fresh()},60000);
+document.getElementById("rf").onclick=fresh;
 </script></body></html>
